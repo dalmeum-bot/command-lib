@@ -63,14 +63,15 @@ Room.prototype = {
 }
 
 //--------------------------------------------------------------
-const KEvent = {
+var KEvent = {
     JOIN: "join",
     LEAVE: "leave",
     MESSAGE: "message"
 }
 
 module.exports = {
-    Kkbot: Kkbot,
+    Kkbot: bot => new Kkbot(bot),
+    KEvent: KEvent, // ANCHOR - check
     Member: Member,
     Room: Room
 };

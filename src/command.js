@@ -1,18 +1,44 @@
+// TODO - KakaoLink
+
 function Commander(prefix) {
-    this.prefix = prefix;
+    this.prefix = prefix || '';
     this.commands = {};
 };
 
 Commander.prototype = {
-    setcommand(commands) {
-        this.commands = commands;
+    add(cmd) {
+        if (typeof cmd == 'function') {
+            let tmp = {};
+            tmp[cmd.name] = cmd;
+            cmd = tmp;
+        }
+
+        this.commands = Object.assign(this.commands, cmd);
+
         return this;
     },
 
-    execute(chat) {
-        if (!chat.content.startsWith(this.prefix)) return null;
+    adds() {
+        let args = Array.from(arguments);
 
-        let args = chat.content.slice(this.prefix.length).split(' ');
+        args.forEach(cmd => {
+            this = this.add(cmd);
+        });
+
+        return this;
+    },
+
+    setDir(dirPath) {
+        // NOTE - module 형식으로 명령어를 만들면 ES5문법을 사용해야 해서, 기본 인자 문법을 사용해야함
+        // TODO - require()
+        // path: 'botPath' + dirPath (ex. dirPath = 'commands' => 'botname/commands')
+        // { filename: export function } 형식으로 this.commands에 삽입
+    },
+
+    execute(intr) {
+        if (!intr.content.startsWith(this.prefix)) return null;
+
+        let args = intr.content.slice(this.prefix.length).split(' ');
         let finded = this.commands;
 
         while (!(finded.constructor == Function || finded.isCmd == true)) {
@@ -75,7 +101,7 @@ Commander.prototype = {
             }
         }
 
-        applier.splice(0, 0, chat);
+        applier.splice(0, 0, intr);
         return finded.execute.apply(null, applier);
     }
 }
@@ -95,9 +121,9 @@ Command.prototype = {
 }
 
 // ---------------------------------------------------------------
-// TODO: easier pattern write
-// TODO: only using named group
-// TODO: union pattern
+// TODO - easier pattern write
+// TODO - using named group
+// TODO - union pattern
 function Pattern(pattern) {
     this.pattern = pattern;
     this.match = {};
@@ -158,15 +184,14 @@ Function.prototype.many = function() {
 }
 
 module.exports = {
-    Command: Command,
-    Commander: Commander,
+    Prefix: prefix => new Commander(prefix),
     Pattern: Pattern,
     Function: Function,
     Type: {
-        int: () => new Pattern(/^([+-]?\d+)$/).setLabel({'value': Number}),
-        float: () => new Pattern(/^(-?\d+\.\d+)$/).setLabel({'value': Number}),
-        string: () => new Pattern(/^(\S+)$/).setLabel({'value': String}),
-        mention: () => new Pattern(/^@(\S+)$/).setLabel({'value': String}),
-        date: () => new Pattern(/^((\d{1,2})[./](\d{1,2}))$/).setLabel({'value': Date, 'month': Number, 'day': Number})
+        INT: () => new Pattern(/^([+-]?\d+)$/).setLabel({'value': Number}),
+        FLOAT: () => new Pattern(/^(-?\d+\.\d+)$/).setLabel({'value': Number}),
+        STRING: () => new Pattern(/^(\S+)$/).setLabel({'value': String}),
+        MENTION: () => new Pattern(/^@(\S+)$/).setLabel({'value': String}),
+        DATE: () => new Pattern(/^((\d{1,2})[./](\d{1,2}))$/).setLabel({'value': Date, 'month': Number, 'day': Number})
     }
 };
