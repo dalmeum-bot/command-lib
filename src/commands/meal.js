@@ -67,5 +67,7 @@ module.exports = {
         } else {
             throw new Error("잘못된 날짜 형식입니다.");
         }
+
+        
     }
 }

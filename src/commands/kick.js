@@ -1,7 +1,10 @@
 const { Prefix, Pattern, Function, Type } = require('Command.js');
 _ = require('Essential');
 
-module.exports = (function (intr, user, reason) {
-    reason ||= "기본이유";
-    return _("@{}를 강퇴합니다. 사유: {}").f(user, reason);
-}).type(Type.mention, Type.string.option())
+module.exports = {
+    type: [Type.MENTION, Type.STRING.option()],
+    execute: function (intr, username, reason) {
+        reason ||= "기본이유";
+        return "@" + username + "를 강퇴합니다. 사유: " + reason;
+    }
+}
