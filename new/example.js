@@ -2,10 +2,12 @@ const { Command } = require('command.js');
 const bot = BotManager.getCurrentBot();
 
 let ping = 
-Command('ping')
-    .execute(() => "pong");
+function (intr) {
+    return "pong";
+}
 
 let add =
+function (intr, )
 Command('add')
     .arg(Number, n1 => Command()
         .arg(Number, n2 => Command()
