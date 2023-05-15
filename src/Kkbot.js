@@ -1,6 +1,6 @@
-T = require('src/Type.js');
+T = require('./Type.js');
 _ = require('essentialib');
-CommandGroup = require('src/Command.js');
+CommandGroup = require('./Command.js');
 
 function Room(msg) {
     this.name = msg.room.name;

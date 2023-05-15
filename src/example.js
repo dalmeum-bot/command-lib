@@ -143,10 +143,10 @@
 //     // 명령어 출력 후 post_init 같은 개념으로 실행됨
 // });
 
-const _ = require('essentialib');
-const { Bot, Interact } = require('Kkbot.js');
-const CommandGroup = require('Command.js');
-T = require('Type.js');
+// const _ = require('essentialib');
+const { Bot, Interact } = require('./Kkbot.js');
+const CommandGroup = require('./Command.js');
+T = require('./Type.js');
 
 const root = new CommandGroup();
 
@@ -160,7 +160,7 @@ root.command(String)
 
 const dataSeparator = ' ';
 const msg = {
-    content: 'hello',
+    content: '/echo hello',
     hasMention: false,
     chatLogId: 95,
     packageName: 'com.kakao.talk',

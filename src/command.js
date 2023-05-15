@@ -1,5 +1,5 @@
 _ = require('essentialib');
-const T = require('src/Type.js');
+const T = require('./Type.js');
 
 function CommandGroup(name) {
     this.name = name || '';
