@@ -1,0 +1,7 @@
+{
+  "name": "command",
+  "version": "1.0.0",
+  "dependencies": {
+    "essentialib": "^1.0.0-alpha-3"
+  }
+}

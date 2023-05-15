@@ -14,7 +14,7 @@ Kkbot.prototype = {
                         room: new Room(msg),
                         member: new Member(msg),
                         
-                        isDual: msg.systemUserId == 95,
+                        isDual: msg.systemUserId === 95,
                         chatLogId: msg.chatLogId,
                         hasMention: msg.isMention,
                         packageName: msg.packageName,
@@ -30,7 +30,7 @@ Kkbot.prototype = {
             case "leave":
                 // execute(chat, leavedMember);
                 break;
-        };
+        }
     }
 };
 
