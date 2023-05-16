@@ -9,7 +9,7 @@ function classify(str) {
         return Date;
     } else if (str.startsWith('/') && /\/[gim]*$/.test(str)) {
         return RegExp;
-    } else if (/^[^, ]+(?:,[^, ]*)*$/.test(str)) {
+    } else if (/^[^, ]+(?:,[^, ]*)+$/.test(str)) {
         return Array;
     } else {
         return String;
@@ -74,10 +74,10 @@ function OptionalType(constructors, defaultValue) {
                 writable: false
             });
         } else {
-            throw new TypeError("defaultValue (" + defaultValue + ") must be a instance of any constructor of " + constructors.map(v => v.name).join(', '));
+            throw new TypeError("기본 인자 초깃값(값: " + defaultValue + ") 은 [" + constructors.map(v => v.name).join(', ') + "] 중 하나의 인스턴스여야 합니다.");
         }
     } else {
-        throw new TypeError("every arguments must be a constructor");
+        throw new TypeError("모든 인자가 생성자 함수여야 합니다.");
     }
 }
 
@@ -86,28 +86,39 @@ check = function (constructors, value) {
 }
 checkStr = function (value) {
     const _checkStr = function (constructors, str) {
-        return constructors.some(f => {
-            if ([String, Number, Boolean, RegExp, Date, Array].includes(f)) {
-                return classify(str) === f
-            } else {
-                return new f(str) instanceof f;
-            }
-        });
+        if (this.optional && str == null)
+            return true;
+        else
+            return _(constructors).some(f => {
+                if ([String, Number, Boolean, RegExp, Date, Array].includes(f)) {
+                    return classify(str) === f
+                } else {
+                    return new f(str) instanceof f;
+                }
+            });
     }
 
-    return _checkStr(this.constructors, value);
+    return _checkStr.apply(this, [this.constructors, value]);
 }
 cast = function (value) {
     const _cast = function (constructors, value) {
-        let constructor = null;
-        constructors.forEach(f => {
-            if (([String, Number, Boolean, RegExp, Date, Array].includes(f) && classify(value) === f) || new f(value) instanceof f) {
-                constructor = f;
-                return false;
+        let find = null;
+
+        constructors.forEach(constructor => {
+            if ([String, Number, Boolean, RegExp, Date, Array].includes(constructor)) {
+                if (classify(value) === constructor) {
+                    find = constructor;
+                    return false;
+                }
+            } else {
+                if (new constructor(value) instanceof constructor) {
+                    find = constructor;
+                    return false;
+                }
             }
         });
 
-        return new constructor(value);
+        return new find(value);
     }
 
     return _cast(this.constructors, value);

@@ -1,52 +1,50 @@
-// const dalmeum = require('src/modules/Kkbot.js')(BotManager.getCurrentBot());
-// const T = dalmeum.command.Type;
 
 //////////////////////////////
 
 // 1. 기본적인 타입 작성법
-    //  - primitive type에 대해서는 이미 정의되어있음
-    // dalmeum.command(T.Array)
-    // dalmeum.command(T.String)
-    // dalmeum.command(T.Number)
-    //  - custom type에 대해서는 직접 정의해야함 (생성자 함수인지 확인할거임, type(arg) instanceof type 로 확인할 예정)
-    // dalmeum.command(T(Int))
-    // dalmeum.command(T(Fraction))
-    //
-    // T.Fraction = T(Fraction)
-    // dalmeum.command(T.Fraction) // 이렇게 해도 됨
-    //  - 편의를 위해 그냥 넣어도 됨
-    // dalmeum.command(Array)
-    // dalmeum.command(String)
-    // dalmeum.command(Int)
-    // dalmeum.command(Fraction)
+//  - primitive type에 대해서는 이미 정의되어있음
+// dalmeum.command(T.Array)
+// dalmeum.command(T.String)
+// dalmeum.command(T.Number)
+//  - custom type에 대해서는 직접 정의해야함 (생성자 함수인지 확인할거임, type(arg) instanceof type 로 확인할 예정)
+// dalmeum.command(T(Int))
+// dalmeum.command(T(Fraction))
+//
+// T.Fraction = T(Fraction)
+// dalmeum.command(T.Fraction) // 이렇게 해도 됨
+//  - 편의를 위해 그냥 넣어도 됨
+// dalmeum.command(Array)
+// dalmeum.command(String)
+// dalmeum.command(Int)
+// dalmeum.command(Fraction)
 
 // 2. 가변 인자 `.many`
-    //  - primitive type에 대해서는 이미 정의되어있음
-    // dalmeum.command(T.many.Number)
-    // dalmeum.command(T.many.String)
-    //
-    // Ts = T.many
-    // dalmeum.command(Ts.Number)    // 이렇게 해도 됨
-    //  - custom type에 대해서는 직접 정의해야함 (생성자 함수인지 확인할거임, type(arg) instanceof type 로 확인할 예정)
-    // dalmeum.command(T.many(Int))
-    // dalmeum.command(T.many(Fraction))
-    //
-    // Ts = T.many
-    // dalmeum.command(Ts(Int))    // 이렇게 해도 됨
+//  - primitive type에 대해서는 이미 정의되어있음
+// dalmeum.command(T.many.Number)
+// dalmeum.command(T.many.String)
+//
+// Ts = T.many
+// dalmeum.command(Ts.Number)    // 이렇게 해도 됨
+//  - custom type에 대해서는 직접 정의해야함 (생성자 함수인지 확인할거임, type(arg) instanceof type 로 확인할 예정)
+// dalmeum.command(T.many(Int))
+// dalmeum.command(T.many(Fraction))
+//
+// Ts = T.many
+// dalmeum.command(Ts(Int))    // 이렇게 해도 됨
 
 //  3. 선택 인자 `.optional`
-    //  - primitive type에 대해서는 이미 정의되어있음
-    // dalmeum.command(T.optional.Number(3))   // 3이 기본값, 기본값이 타입에 안 맞으면 오류
-    // dalmeum.command(T.optional.String('hello'))
-    //
-    // To = T.optional
-    // dalmeum.command(To.Number(3))    // 이렇게 해도 됨
-    //  - custom type에 대해서는 직접 정의해야함 (생성자 함수인지 확인할거임, type(arg) instanceof type 로 확인할 예정)
-    // dalmeum.command(T.optional(Int)(new Int(345)))
-    // dalmeum.command(T.optional(Fraction)(new Fraction(3, 4)))
-    //
-    // To = T.option
-    // dalmeum.command(To(Int)(new Int(345)))    // 이렇게 해도 됨
+//  - primitive type에 대해서는 이미 정의되어있음
+// dalmeum.command(T.optional.Number(3))   // 3이 기본값, 기본값이 타입에 안 맞으면 오류
+// dalmeum.command(T.optional.String('hello'))
+//
+// To = T.optional
+// dalmeum.command(To.Number(3))    // 이렇게 해도 됨
+//  - custom type에 대해서는 직접 정의해야함 (생성자 함수인지 확인할거임, type(arg) instanceof type 로 확인할 예정)
+// dalmeum.command(T.optional(Int)(new Int(345)))
+// dalmeum.command(T.optional(Fraction)(new Fraction(3, 4)))
+//
+// To = T.option
+// dalmeum.command(To(Int)(new Int(345)))    // 이렇게 해도 됨
 
 // 4. 타입 조합
 //     dalmeum.command(T(Number, String))  // Number | String
@@ -150,17 +148,41 @@ T = require('./Type.js');
 
 const root = new CommandGroup();
 
-root.command(String)
+function Username(name) {
+    if (!(typeof name === 'string' && name.startsWith('@'))) {
+        throw new TypeError('content must be started with @');
+    }
+    this.name = name.substring(1);
+}
+
+root.command(T(Username), T(Date), T.optional(String)('그냥꼬와서'))
 (
-    function echo(content) {
-        console.log(content);
-        console.log(this);
+    function kick(username, until, reason) {
+        console.log(`${username.name} kicked until ${until} because ${reason}`);
     }
 )
 
+root.command(T.many(String))
+(
+    function echo(content) {
+        console.log(content);
+    }
+)
+
+math = root.command.group('math')
+
+math.command(T.many.Number)
+(
+    function add(numbers) {
+        console.log(numbers.reduce((a, b) => a + b, 0));
+    }
+)
+
+root.set(math);
+
 const dataSeparator = ' ';
 const msg = {
-    content: '/echo hello',
+    content: '/math add 1 2 3',
     hasMention: false,
     chatLogId: 95,
     packageName: 'com.kakao.talk',
@@ -177,13 +199,13 @@ const msg = {
     },
     image: undefined
 };
-let args = msg.content.split(dataSeparator);
-msg.command = args.shift().substring(1);
-msg.args = args;
-msg.data = args.join(dataSeparator);
-
 const intr = new Interact(msg);
-
-x = root.execute(intr, ' ');
-if (x == null)
+let args = msg.content.split(dataSeparator);
+intr.command = args.shift().substring(1);
+intr.args = args;
+intr.data = args.join(dataSeparator);
+x = root.execute(intr, dataSeparator);
+if (x != null)
     console.log(x);
+// const dalmeum = require('src/modules/Kkbot.js')(BotManager.getCurrentBot());
+// const T = dalmeum.command.Type;

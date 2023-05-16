@@ -90,12 +90,14 @@ CommandGroup.prototype.execute = function (intr, dataSeparator) {
                 sendArgs.push(args.slice(i).map(arg => type.cast(arg)));
             }
             return false;
+        } else if (type.optional) {
+            sendArgs.push(args[i] != null ? type.cast(args[i]) : type.defaultValue);
         } else {
             sendArgs.push(type.cast(args[i]));
         }
     });
 
-    return execute.apply(intr, sendArgs);
+    return pointer.execute.apply(intr, sendArgs);
 }
 
 function command() {
